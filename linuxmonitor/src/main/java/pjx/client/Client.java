@@ -1,7 +1,7 @@
 package pjx.client;
 
-import pjx.ui.ConnetUI;
-import pjx.ui.WindowUI;
+import pjx.client.ui.ConnetUI;
+import pjx.client.ui.WindowUI;
 
 public class Client {
 

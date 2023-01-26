@@ -13,8 +13,8 @@ import javax.swing.Timer;
 
 import com.alibaba.fastjson.JSONObject;
 
-import pjx.ui.ConnetUI;
-import pjx.ui.WindowUI;
+import pjx.client.ui.ConnetUI;
+import pjx.client.ui.WindowUI;
 
 public class ClientSocket {
 	private DatagramSocket socket;
@@ -48,15 +48,18 @@ public class ClientSocket {
 
 	public String getResvInfo(byte[] req) {
 		String info = "";
+		byte[] b = new byte[1024];
 		DatagramPacket packet = new DatagramPacket(req, req.length);
 		try {
 			socket.send(packet);
-			socket.receive(packet);
-			info = new String(packet.getData(), packet.getOffset(), packet.getLength(), Charset.forName("utf8"));
+			DatagramPacket resvpacket = new DatagramPacket(b, b.length);
+			socket.receive(resvpacket);
+			info = new String(resvpacket.getData(), resvpacket.getOffset(), resvpacket.getLength(),
+					Charset.forName("utf8"));
 		} catch (IOException e) {
 			e.printStackTrace();
 			String[] option = { "重新连接", "退出程序" };
-			int a = JOptionPane.showOptionDialog(null, "", "提示信息", JOptionPane.YES_NO_CANCEL_OPTION,
+			int a = JOptionPane.showOptionDialog(null, "与服务器连接断开", "提示信息", JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, option, option[1]);
 			if (a == 0) {
 				timer.stop();
@@ -72,11 +75,12 @@ public class ClientSocket {
 	public void showInfo() {
 		cui.dispose();
 		wui.setVisible(true);
-		timer = new Timer(2, new ActionListener() {
+		timer = new Timer(1000, new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String info = getResvInfo(REQ.getBytes());
+				System.out.println(info);
 				JSONObject json = JSONObject.parseObject(info);
 				String cpu = json.getString("cpu");
 				String mem = json.getString("mem");
